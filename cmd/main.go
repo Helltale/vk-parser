@@ -1,15 +1,11 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"parser/config"
-	"parser/pkg/files"
-	"parser/pkg/flags"
+	"parser/pkg/parser"
 	"sync"
-
-	"github.com/chromedp/chromedp"
 )
 
 func main() {
@@ -21,7 +17,8 @@ func main() {
 
 	fmt.Println(imgclass)
 
-	urls, err := flags.Geturls()
+	// urls, _, err := flags.Geturls()
+	urls := []string{"nickless47"}
 	if err != nil {
 		fmt.Printf("error: %s", err)
 	}
@@ -33,25 +30,9 @@ func main() {
 	for i, url := range urls {
 		go func(link string, index int) {
 			defer wg.Done()
-			parser(link, index, imgclass)
+			parser.Parse(link, index, imgclass)
 		}(url, i)
 	}
 
 	wg.Wait()
-}
-
-func parser(link string, index int, imgclass string) {
-	ctx, cancel := chromedp.NewContext(context.Background())
-	defer cancel()
-
-	var body string
-	err := chromedp.Run(ctx, chromedp.Navigate(link), chromedp.OuterHTML("html", &body))
-	if err != nil {
-		fmt.Println("error: can not get url: ", err)
-		return
-	}
-
-	files.ToHTML(body, index)
-
-	files.ToTXT(body, imgclass, index)
 }
