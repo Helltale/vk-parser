@@ -29,7 +29,7 @@ func ToJSON(body string, index int) {
 
 	err = os.WriteFile(filename, formattedJSON, 0644)
 	if err != nil {
-		fmt.Println("error: can not write in file", err)
+		fmt.Println("error: can not write in fileю %s", err)
 		return
 	}
 

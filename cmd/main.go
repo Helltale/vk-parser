@@ -15,18 +15,23 @@ func main() {
 	//300 - downloading
 	//input - []string with urls
 	//download - flag for download some content
-	selection, input, download, _ := flags.FlagHandler()
+	selection, input := flags.FlagHandler()
 	switch selection {
 	case 100:
 		{
 			fmt.Println("info: starting downloading wall by id")
-			routinParse(input, download)
+			routinParse(input, selection)
+		}
+	case 200:
+		{
+			fmt.Println("info: starting downloading post by id")
+			routinParse(input, selection)
 		}
 	}
 	fmt.Println("info: close program")
 }
 
-func routinParse(urls []string, downloadAdress string) {
+func routinParse(urls []string, selection int) {
 	var wg sync.WaitGroup
 	wg.Add(len(urls))
 	fmt.Printf("info: entered links: %d\n", len(urls))
@@ -34,7 +39,7 @@ func routinParse(urls []string, downloadAdress string) {
 	for i, url := range urls {
 		go func(link string, index int) {
 			defer wg.Done()
-			parser.Parse(link, index, downloadAdress)
+			parser.Parse(link, index, selection)
 		}(url, i)
 	}
 

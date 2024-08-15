@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func FlagHandler() (int, []string, string, bool) {
+func FlagHandler() (int, []string) {
 	wall := flag.String("wall", "", "generate response{N}.json of wall")
 	post := flag.String("post", "", "generate response{N}.json of post")
 
@@ -23,21 +23,21 @@ func FlagHandler() (int, []string, string, bool) {
 
 	if *wall != "" {
 		wallSlice := strings.Split(*wall, " ")
-		return 100, wallSlice, "", false
+		return 100, wallSlice
 	}
 	if *post != "" {
 		postSlice := strings.Split(*post, " ")
-		return 200, postSlice, "", false
+		return 200, postSlice
 	}
 	if *download {
 		if *fileFlag != "" { //problem?
 			fileFlagSlice := strings.Split(*fileFlag, " ")
-			return 311, fileFlagSlice, "", true //-download -file c:/dir/file.txt (ссылки из конкретного файла)
+			return 311, fileFlagSlice //-download -file c:/dir/file.txt (ссылки из конкретного файла)
 		} else {
-			return 310, nil, "", true //-download -file (ссылки из файла по умолчанию)
+			return 310, nil //-download -file (ссылки из файла по умолчанию)
 		}
 	} else {
 		downloadSlice := strings.Split(*post, " ")
-		return 321, downloadSlice, "", true //-download example.com/file.jpg (напрямую ссылки)
+		return 321, downloadSlice //-download example.com/file.jpg (напрямую ссылки)
 	}
 }
