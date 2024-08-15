@@ -1,43 +1,43 @@
 package flags
 
 import (
-	"errors"
 	"flag"
+	"os"
+	"strings"
 )
 
-// func Geturls() ([]string, error) {
-// 	urlsFlag := flag.String("url", "", "urls for parsing")
-// 	flag.Parse()
+func FlagHandler() (int, []string, string, bool) {
+	wall := flag.String("wall", "", "generate response{N}.json of wall")
+	post := flag.String("post", "", "generate response{N}.json of post")
 
-// 	urls := flag.Args()
-// 	if len(urls) == 0 && *urlsFlag == "" {
-// 		return nil, errors.New("err: no urls enter")
-// 	}
-
-// 	res := make([]string, 0, len(urls)+1)
-// 	res = append(res, urls...)
-
-// 	return res, nil
-// }
-
-func Geturls() ([]string, bool, error) {
-	urlsFlag := flag.String("url", "", "urls for parsing")
-	downloadFlag := flag.Bool("download", false, "download the URLs")
+	download := flag.Bool("download", false, "start to download media")
+	fileFlag := flag.String("file", "", "file with urls for downloading")
+	// link := flag.String("link", "", "link for download media")
 
 	flag.Parse()
 
-	if *urlsFlag == "" {
-		return nil, false, errors.New("err: no URLs entered")
+	if *wall == "" && *post == "" && !*download {
+		flag.Usage()
+		os.Exit(1)
 	}
 
-	if *downloadFlag && *urlsFlag == "" {
-		return nil, false, errors.New("err: -download flag can only be used with -url flag")
+	if *wall != "" {
+		wallSlice := strings.Split(*wall, " ")
+		return 100, wallSlice, "", false
 	}
-
-	urls := flag.Args()
-	res := make([]string, 0, len(urls)+1)
-	res = append(res, *urlsFlag)
-	res = append(res, urls...)
-
-	return res, *downloadFlag, nil
+	if *post != "" {
+		postSlice := strings.Split(*post, " ")
+		return 200, postSlice, "", false
+	}
+	if *download {
+		if *fileFlag != "" { //problem?
+			fileFlagSlice := strings.Split(*fileFlag, " ")
+			return 311, fileFlagSlice, "", true //-download -file c:/dir/file.txt (ссылки из конкретного файла)
+		} else {
+			return 310, nil, "", true //-download -file (ссылки из файла по умолчанию)
+		}
+	} else {
+		downloadSlice := strings.Split(*post, " ")
+		return 321, downloadSlice, "", true //-download example.com/file.jpg (напрямую ссылки)
+	}
 }

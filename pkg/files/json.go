@@ -18,7 +18,6 @@ func ToJSON(body string, index int) {
 
 	filename := filepath.Join(resPath, fmt.Sprintf("response%d.json", index))
 
-	// Преобразуем JSON-строку в объект
 	var jsonData map[string]interface{}
 	err = json.Unmarshal([]byte(body), &jsonData)
 	if err != nil {
@@ -26,10 +25,8 @@ func ToJSON(body string, index int) {
 		return
 	}
 
-	// Форматируем JSON с отступами, но сохраняем ссылки в оригинальном формате
 	formattedJSON := formatJSON(jsonData)
 
-	// Записываем форматированный JSON в файл
 	err = os.WriteFile(filename, formattedJSON, 0644)
 	if err != nil {
 		fmt.Println("error: can not write in file", err)
@@ -44,16 +41,30 @@ func formatJSON(data interface{}) []byte {
 	case map[string]interface{}:
 		var buffer bytes.Buffer
 		buffer.WriteString("{\n")
-		for key, value := range v {
-			buffer.WriteString(fmt.Sprintf("  \"%s\": %s,\n", key, formatJSON(value)))
+		keys := make([]string, 0, len(v))
+		for key := range v {
+			keys = append(keys, key)
+		}
+		for i, key := range keys {
+			buffer.WriteString(fmt.Sprintf("  \"%s\": %s", key, formatJSON(v[key])))
+			if i < len(keys)-1 {
+				buffer.WriteString(",\n")
+			} else {
+				buffer.WriteString("\n")
+			}
 		}
 		buffer.WriteString("}")
 		return buffer.Bytes()
 	case []interface{}:
 		var buffer bytes.Buffer
 		buffer.WriteString("[\n")
-		for _, value := range v {
-			buffer.WriteString(fmt.Sprintf("  %s,\n", formatJSON(value)))
+		for i, value := range v {
+			buffer.WriteString(fmt.Sprintf("  %s", formatJSON(value)))
+			if i < len(v)-1 {
+				buffer.WriteString(",\n")
+			} else {
+				buffer.WriteString("\n")
+			}
 		}
 		buffer.WriteString("]")
 		return buffer.Bytes()

@@ -8,7 +8,7 @@ import (
 	"parser/pkg/files"
 )
 
-func Parse(link string, index int, imgclass string) {
+func Parse(link string, index int, downloadAdress string) {
 	token, err := config.GetApiToken()
 	if err != nil {
 		fmt.Println(err)
@@ -45,11 +45,5 @@ func Parse(link string, index int, imgclass string) {
 	}
 
 	files.ToJSON(string(body), index)
-
-	//old methods
-
-	// files.ToHTML(body, index)
-
-	// files.ToTXT(body, imgclass, index)
 
 }

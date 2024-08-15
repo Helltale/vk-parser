@@ -2,35 +2,39 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"parser/config"
+	"parser/pkg/flags"
 	"parser/pkg/parser"
 	"sync"
 )
 
 func main() {
-	imgclass, err := config.GetCassNameImg()
-	if err != nil {
-		fmt.Printf("error: %s\n", err)
-		os.Exit(2)
+
+	//selection - param for switch case
+	//100 - wall
+	//200 - post
+	//300 - downloading
+	//input - []string with urls
+	//download - flag for download some content
+	selection, input, download, _ := flags.FlagHandler()
+	switch selection {
+	case 100:
+		{
+			fmt.Println("info: starting downloading wall by id")
+			routinParse(input, download)
+		}
 	}
+	fmt.Println("info: close program")
+}
 
-	fmt.Println(imgclass)
-
-	// urls, _, err := flags.Geturls()
-	urls := []string{"nickless47"}
-	if err != nil {
-		fmt.Printf("error: %s", err)
-	}
-
+func routinParse(urls []string, downloadAdress string) {
 	var wg sync.WaitGroup
 	wg.Add(len(urls))
-	fmt.Printf("enter links: %d\n", len(urls))
+	fmt.Printf("info: entered links: %d\n", len(urls))
 
 	for i, url := range urls {
 		go func(link string, index int) {
 			defer wg.Done()
-			parser.Parse(link, index, imgclass)
+			parser.Parse(link, index, downloadAdress)
 		}(url, i)
 	}
 
