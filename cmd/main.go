@@ -9,6 +9,12 @@ import (
 
 func main() {
 
+	// config.PrintYAMLFile("api.yaml")
+
+	// config.UpdateYAMLField("api.yaml", "api-token", "newApiKey")
+
+	// config.PrintYAMLFile("api.yaml")
+
 	//selection - param for switch case
 	//100 - wall
 	//200 - post

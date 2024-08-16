@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -15,114 +16,222 @@ type Config struct {
 	DownloadLink    string `yaml:"download-link"`
 }
 
+func (c *Config) GetResultDirectory() string {
+	return c.ResultDirectory
+}
+
+func (c *Config) GetClassNameImg() string {
+	return c.ClassNameImg
+}
+
+func (c *Config) GetDownloadLink() string {
+	return c.DownloadLink
+}
+
+func (c *Config) SetConfig(config []byte) error {
+	return yaml.Unmarshal(config, c)
+}
+
 type Api struct {
 	ApiToken   string `yaml:"api-token"`
 	ApiKey     string `yaml:"api-key"`
 	ApiVersion string `yaml:"api-version"`
 }
 
-func getConf() (*Config, error) {
-	projectDir, err := os.Getwd()
-	if err != nil {
-		return nil, errors.New("error: can not get project directory")
-	}
-	// Получаем директорию, в которой находится исполняемый файл
-	projectDir = filepath.Dir(projectDir)
-
-	file, err := os.Open(filepath.Join(projectDir, "config", "config.yaml"))
-	if err != nil {
-		return nil, errors.New("error: cannot get config file config.yaml")
-	}
-	defer file.Close()
-
-	read, err := io.ReadAll(file)
-	if err != nil {
-		return nil, errors.New("error: cannot read config file config.yaml")
-	}
-
-	c := Config{}
-
-	err = yaml.Unmarshal(read, &c)
-	if err != nil {
-		return nil, errors.New("error: cannot unmarshal config file config.yaml")
-	}
-
-	return &c, nil
+func (a *Api) GetApiToken() string {
+	return a.ApiToken
 }
 
-func getApi() (*Api, error) {
+func (a *Api) GetApiKey() string {
+	return a.ApiKey
+}
+
+func (a *Api) GetApiVersion() string {
+	return a.ApiVersion
+}
+
+func (a *Api) SetConfig(config []byte) error {
+	return yaml.Unmarshal(config, a)
+}
+
+type Configurable interface {
+	SetConfig(config []byte) error
+}
+
+var (
+	config Config
+	api    Api
+)
+
+func getYAMLPath(file string) (string, error) {
 	projectDir, err := os.Getwd()
 	if err != nil {
-		return nil, errors.New("error: can not get project directory")
+		return "", fmt.Errorf("error: can not get project directory: %v", err)
 	}
-	// Получаем директорию, в которой находится исполняемый файл
 	projectDir = filepath.Dir(projectDir)
 
-	file, err := os.Open(filepath.Join(projectDir, "config", "config.yaml"))
+	filePath := filepath.Join(projectDir, "config", file)
+
+	return filePath, nil
+}
+
+// for example:
+// config - api
+// nameFile - api.yaml
+func getConfig(c Configurable, nameFile string) error {
+	filePath, err := getYAMLPath(nameFile)
 	if err != nil {
-		return nil, errors.New("error: cannot get config file config.yaml")
+		return errors.New("error: cannot get path file " + nameFile)
+	}
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		return errors.New("error: cannot get config file " + nameFile)
 	}
 	defer file.Close()
 
 	read, err := io.ReadAll(file)
 	if err != nil {
-		return nil, errors.New("error: cannot read config file config.yaml")
+		return errors.New("error: cannot read config file " + nameFile)
 	}
 
-	api := Api{}
-
-	err = yaml.Unmarshal(read, &api)
+	err = c.SetConfig(read)
 	if err != nil {
-		return nil, errors.New("error: cannot unmarshal config file config.yaml")
+		return errors.New("error: cannot unmarshal config file " + nameFile)
 	}
 
-	return &api, nil
+	return nil
 }
 
 func GetCassNameImg() (string, error) {
-	conf, err := getConf()
+	var cfg Config
+	err := getConfig(&cfg, "config.yaml")
 	if err != nil {
 		return "", err
 	}
-	return conf.ClassNameImg, nil
+	return cfg.GetClassNameImg(), nil
 }
 
 func GetResultDirectory() (string, error) {
-	conf, err := getConf()
+	var cfg Config
+	err := getConfig(&cfg, "config.yaml")
 	if err != nil {
 		return "", err
 	}
-	return conf.ResultDirectory, nil
+	return cfg.GetResultDirectory(), nil
 }
 
 func GetDownloadLink() (string, error) {
-	conf, err := getConf()
+	var cfg Config
+	err := getConfig(&cfg, "config.yaml")
 	if err != nil {
 		return "", err
 	}
-	return conf.DownloadLink, nil
+	return cfg.GetDownloadLink(), nil
 }
 
 func GetApiToken() (string, error) {
-	api, err := getApi()
+	var api Api
+	err := getConfig(&api, "api.yaml")
 	if err != nil {
 		return "", err
 	}
-	return api.ApiToken, nil
+	return api.GetApiToken(), nil
 }
 
 func GetApiKey() (string, error) {
-	api, err := getApi()
+	var api Api
+	err := getConfig(&api, "api.yaml")
 	if err != nil {
 		return "", err
 	}
-	return api.ApiKey, nil
+	return api.GetApiKey(), nil
 }
 
 func GetApiVersion() (string, error) {
-	api, err := getApi()
+	var api Api
+	err := getConfig(&api, "api.yaml")
 	if err != nil {
 		return "", err
 	}
-	return api.ApiVersion, nil
+	return api.GetApiVersion(), nil
+}
+
+// Функция для чтения YAML файла в map[string]interface{}
+func readYAMLFile(filePath string) (map[string]interface{}, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("error: cannot get config file %s: %v", filepath.Base(filePath), err)
+	}
+	defer file.Close()
+
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return nil, fmt.Errorf("error: cannot read config file %s: %v", filepath.Base(filePath), err)
+	}
+
+	var config map[string]interface{}
+	err = yaml.Unmarshal(data, &config)
+	if err != nil {
+		return nil, fmt.Errorf("error: cannot unmarshal config file %s: %v", filepath.Base(filePath), err)
+	}
+
+	return config, nil
+}
+
+// Функция для записи map[string]interface{} в YAML файл
+func writeYAMLFile(filePath string, config map[string]interface{}) error {
+	updatedData, err := yaml.Marshal(config)
+	if err != nil {
+		return fmt.Errorf("error: cannot marshal config file %s: %v", filepath.Base(filePath), err)
+	}
+
+	err = os.WriteFile(filePath, updatedData, 0644)
+	if err != nil {
+		return fmt.Errorf("error: cannot write config file %s: %v", filepath.Base(filePath), err)
+	}
+
+	return nil
+}
+
+// Функция для обновления значения поля в YAML файле по ключу
+func UpdateYAMLField(filePath string, key string, newValue interface{}) error {
+	filePath1, err := getYAMLPath(filePath)
+	if err != nil {
+		return err
+	}
+
+	config, err := readYAMLFile(filePath1)
+	if err != nil {
+		return err
+	}
+
+	config[key] = newValue
+
+	err = writeYAMLFile(filePath1, config)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Функция для вывода содержимого YAML файла
+func PrintYAMLFile(filePath string) error {
+	filePath1, err := getYAMLPath(filePath)
+	if err != nil {
+		return err
+	}
+
+	config, err := readYAMLFile(filePath1)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("file content:")
+	for key, value := range config {
+		fmt.Printf("%v: %v\n", key, value)
+	}
+
+	return nil
 }

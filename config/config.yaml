@@ -1,9 +1,2 @@
 result-directory: "D:\\projects\\golang\\parser-vk"
 download-link: "D:\\projects\\golang\\parser-vk"
-
-api-token: ""
-api-key: ""
-api-version: 5.199
-
-class-name-img: "PhotoPrimaryAttachment__imageElement"
-class-name-collage-img: "MediaGrid__imageElement"

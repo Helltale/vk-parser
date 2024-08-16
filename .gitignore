@@ -1,3 +1,4 @@
 .vscode
 go.sum
 go.mod
+config/api.yaml
