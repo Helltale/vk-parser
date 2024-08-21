@@ -228,7 +228,7 @@ func PrintYAMLFile(filePath string) error {
 		return err
 	}
 
-	fmt.Println("file content:")
+	fmt.Println("config content:")
 	for key, value := range config {
 		fmt.Printf("%v: %v\n", key, value)
 	}

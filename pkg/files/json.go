@@ -81,14 +81,14 @@ func formatJSON(data interface{}) []byte {
 	}
 }
 
-func ToJSON2(jsonString string, index int) error {
+func ToJSON2(jsonString string, fnparts []string) error {
 	resPath, err := config.GetResultDirectory()
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		os.Exit(2)
 	}
 
-	filename := filepath.Join(resPath, fmt.Sprintf("response%d.json", index))
+	filename := filepath.Join(resPath, fmt.Sprintf("%s_response_%s.json", fnparts[0], fnparts[1]))
 
 	var data interface{}
 	err = json.Unmarshal([]byte(jsonString), &data)
@@ -106,6 +106,6 @@ func ToJSON2(jsonString string, index int) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("done: created response%d.json\n", index)
+	fmt.Printf("done: created %s_response_%s.json\n", fnparts[0], fnparts[1])
 	return nil
 }
