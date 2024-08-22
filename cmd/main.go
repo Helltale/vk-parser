@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"parser/config"
+	"parser/pkg/directory"
+	"parser/pkg/files"
 	"parser/pkg/flags"
 	"parser/pkg/parser"
 	"sync"
@@ -16,7 +18,12 @@ func main() {
 	//parse
 	case code == 100 && input != nil:
 		fmt.Println("info: program started")
+		directory.CreateFullPath(input)
 		multithreadingParse(input)
+		err := files.AllInOneJSON(input)
+		if err != nil {
+			fmt.Println("error: can not make full file: ", err)
+		}
 		fmt.Println("info: program complete")
 
 	//show config
@@ -39,53 +46,53 @@ func main() {
 
 }
 
-func multithreadingParse(urls []string) {
+func multithreadingParse(domains []string) {
 	var wg sync.WaitGroup
 	ch := make(chan struct{}, 3)
-	for _, url := range urls {
+	for _, domain := range domains {
 		//3 request per second
 		wg.Add(6)
-		go func(url string) {
+		go func(domain string) {
 			defer wg.Done()
 			ch <- struct{}{}
-			parser.ParserNew(url, 1)
+			parser.ParserNew(domain, 1)
 			<-ch
-		}(url)
+		}(domain)
 
-		go func(url string) {
+		go func(domain string) {
 			defer wg.Done()
 			ch <- struct{}{}
-			parser.ParserNew(url, 2)
+			parser.ParserNew(domain, 2)
 			<-ch
-		}(url)
+		}(domain)
 
-		go func(url string) {
+		go func(domain string) {
 			defer wg.Done()
 			ch <- struct{}{}
-			parser.ParserNew(url, 3)
+			parser.ParserNew(domain, 3)
 			<-ch
-		}(url)
+		}(domain)
 
-		go func(url string) {
+		go func(domain string) {
 			defer wg.Done()
 			ch <- struct{}{}
-			parser.ParserNew(url, 4)
+			parser.ParserNew(domain, 4)
 			<-ch
-		}(url)
+		}(domain)
 
-		go func(url string) {
+		go func(domain string) {
 			defer wg.Done()
 			ch <- struct{}{}
-			parser.ParserNew(url, 5)
+			parser.ParserNew(domain, 5)
 			<-ch
-		}(url)
+		}(domain)
 
-		go func(url string) {
+		go func(domain string) {
 			defer wg.Done()
 			ch <- struct{}{}
-			parser.ParserNew(url, 6)
+			parser.ParserNew(domain, 6)
 			<-ch
-		}(url)
+		}(domain)
 
 		wg.Wait()
 	}

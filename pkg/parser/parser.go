@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func ParserNew(id string, index int) {
+func ParserNew(domain string, index int) {
 	token, err := config.GetApiToken()
 	if err != nil {
 		fmt.Println(err)
@@ -22,12 +22,12 @@ func ParserNew(id string, index int) {
 
 	var url string
 	fnparts := make([]string, 2)
-	fnparts[0] = id
+	fnparts[0] = domain
 	switch {
 	//user
 	case index == 1:
 		fnparts[1] = "user"
-		url = fmt.Sprintf("https://api.vk.com/method/users.get?access_token=%s&v=%s&user_ids=%s&fields=aboutactivities,about,blacklisted,blacklisted_by_me,books,bdate,can_be_invited_group,can_post,can_see_all_posts,can_see_audio,can_send_friend_request,can_write_private_message,career,common_count,connections,contacts,city,crop_photo,domain,education,exports,followers_count,friend_status,has_photo,has_mobile,home_town,photo_100,photo_200,photo_200_orig,photo_400_orig,photo_50,sex,site,schools,screen_name,status,verified,games,interests,is_favorite,is_friend,is_hidden_from_feed,last_seen,maiden_name,military,movies,music,nickname,occupation,online,personal,photo_id,photo_max,photo_max_orig,quotes,relation,relatives,timezone,tv,universities,is_verified", token, version, id)
+		url = fmt.Sprintf("https://api.vk.com/method/users.get?access_token=%s&v=%s&user_ids=%s&fields=aboutactivities,about,blacklisted,blacklisted_by_me,books,bdate,can_be_invited_group,can_post,can_see_all_posts,can_see_audio,can_send_friend_request,can_write_private_message,career,common_count,connections,contacts,city,crop_photo,domain,education,exports,followers_count,friend_status,has_photo,has_mobile,home_town,photo_100,photo_200,photo_200_orig,photo_400_orig,photo_50,sex,site,schools,screen_name,status,verified,games,interests,is_favorite,is_friend,is_hidden_from_feed,last_seen,maiden_name,military,movies,music,nickname,occupation,online,personal,photo_id,photo_max,photo_max_orig,quotes,relation,relatives,timezone,tv,universities,is_verified", token, version, domain)
 	//video
 	case index == 2:
 		fnparts[1] = "video"
