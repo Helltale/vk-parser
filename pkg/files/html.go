@@ -30,5 +30,5 @@ func ToHTML(body string, index int) {
 		return
 	}
 
-	fmt.Println("done: create file for responce \"response" + strconv.Itoa(index) + ".html\"")
+	fmt.Println("info: create file for responce \"response" + strconv.Itoa(index) + ".html\"")
 }

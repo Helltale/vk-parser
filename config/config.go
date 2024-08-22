@@ -58,11 +58,6 @@ type Configurable interface {
 	SetConfig(config []byte) error
 }
 
-var (
-	config Config
-	api    Api
-)
-
 func getYAMLPath(file string) (string, error) {
 	projectDir, err := os.Getwd()
 	if err != nil {

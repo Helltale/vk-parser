@@ -13,12 +13,13 @@ func main() {
 
 	code, input := flags.FlagHandler()
 	switch {
-	//парсим
+	//parse
 	case code == 100 && input != nil:
 		fmt.Println("info: program started")
 		multithreadingParse(input)
+		fmt.Println("info: program complete")
 
-	//вывод конфига
+	//show config
 	case code == 200:
 		err := config.PrintYAMLFile("api.yaml")
 		if err != nil {
@@ -26,7 +27,7 @@ func main() {
 			os.Exit(1)
 		}
 
-	//изменение конфига
+	//change config
 	case code == 210 && input != nil:
 		fmt.Println(input[0], input[1])
 		err := config.UpdateYAMLField("api.yaml", input[0], input[1])
@@ -42,8 +43,7 @@ func multithreadingParse(urls []string) {
 	var wg sync.WaitGroup
 	ch := make(chan struct{}, 3)
 	for _, url := range urls {
-
-		//3 запроса в секундку, мб лучше не рисковать...
+		//3 request per second
 		wg.Add(6)
 		go func(url string) {
 			defer wg.Done()

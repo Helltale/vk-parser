@@ -31,23 +31,23 @@ func ParserNew(id string, index int) {
 	//video
 	case index == 2:
 		fnparts[1] = "video"
-		url = fmt.Sprintf("https://api.vk.com/method/video.get?access_token=%s&v=%s&owner_id=%s&extended=1", token, version, url)
+		url = fmt.Sprintf("https://api.vk.com/method/video.get?access_token=%s&v=%s&owner_id=%s&extended=1", token, version, fnparts[0])
 	//photo-wall
 	case index == 3:
 		fnparts[1] = "photo-wall"
-		url = fmt.Sprintf("https://api.vk.com/method/photos.get?access_token=%s&v=%s&owner_id=%s&album_id=wall&extended=1", token, version, url)
+		url = fmt.Sprintf("https://api.vk.com/method/photos.get?access_token=%s&v=%s&owner_id=%s&album_id=wall&extended=1", token, version, fnparts[0])
 	//photo-profile
 	case index == 4:
-		fnparts[1] = "photo-wall"
-		url = fmt.Sprintf("https://api.vk.com/method/photos.get?access_token=%s&v=%s&owner_id=%s&album_id=profile&extended=1", token, version, url)
+		fnparts[1] = "photo-profile"
+		url = fmt.Sprintf("https://api.vk.com/method/photos.get?access_token=%s&v=%s&owner_id=%s&album_id=profile&extended=1", token, version, fnparts[0])
 	//photo-saved
 	case index == 5:
 		fnparts[1] = "photo-saved"
-		url = fmt.Sprintf("https://api.vk.com/method/photos.get?access_token=%s&v=%s&owner_id=%s&album_id=saved&extended=1", token, version, url)
+		url = fmt.Sprintf("https://api.vk.com/method/photos.get?access_token=%s&v=%s&owner_id=%s&album_id=saved&extended=1", token, version, fnparts[0])
 	//wall
 	case index == 6:
 		fnparts[1] = "wall"
-		url = fmt.Sprintf("https://api.vk.com/method/wall.get?access_token=%s&v=%s&domain=%s&extended=1", token, version, url)
+		url = fmt.Sprintf("https://api.vk.com/method/wall.get?access_token=%s&v=%s&domain=%s&extended=1", token, version, fnparts[0])
 	}
 
 	resp, err := http.Get(url)
